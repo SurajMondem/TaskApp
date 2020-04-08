@@ -40,11 +40,11 @@ var userSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    role: {
+    role: {                 //TODO: THINK ABOUT THIS AGAIN
         type: Number,
-        default: 0
+        default: 0  
     }
-});
+} { timestamps: true } );
 
 userSchema.virtual("password")
     .set(function(password){
