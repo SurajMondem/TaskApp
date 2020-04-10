@@ -36,15 +36,11 @@ var userSchema = new mongoose.Schema({
         maxlength: 20,
         // unique: true     TODO: DO MAKE CHANGES HERE
     },
-    boards: {
-        type: Array,
-        default: []
-    },
     role: {                 //TODO: THINK ABOUT THIS AGAIN
         type: Number,
         default: 0  
     }
-} { timestamps: true } );
+}, { timestamps: true } );
 
 userSchema.virtual("password")
     .set(function(password){
