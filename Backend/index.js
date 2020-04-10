@@ -1,11 +1,23 @@
+require('dotenv').config();
+
+//PACKAGE.JSON IMPORTS
 const express = require("express");
 const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
+//ROUTER IMPORTS
+const authRoutes = require("./routes/authentication");
+
+
+//STARTER
 const app = express();
-const port = 4000;
+const port = process.env.PORT;
+const databaseUrl = process.env.DATABASE;
 
-const databaseUrl = "mongodb://localhost:27017/Task";
 
+//DATABASE CONNECTION
 mongoose.connect(databaseUrl ,{
      useNewUrlParser: true,
      useUnifiedTopology: true,
@@ -13,12 +25,33 @@ mongoose.connect(databaseUrl ,{
     })
     .then(() => {
         console.log("DATABASE CONNECTED...");
-    });
+    }).catch(
+       () => {console.log("DATABASE CONNECTION FAILED");}
+    );
 
+//MIDDLEWARES
+app.use(bodyParser.json());
+
+app.use(cookieParser());
+
+app.use(cors());
+
+//ROUTES
 app.get('/', (request, response) => {
     return response.send('Hello world')
 });
 
+app.use('/api', authRoutes);
+
+// // TEST CODE STARTS!!!
+// admin = (request, response) => {
+//     return response.send('Welcome to Admin Dashboard');
+// }
+
+// app.get('/admin',admin);
+
+// // TEST CODE ENDS!!!
+
 app.listen(port, () => {
-    console.log('Server Started at 4000...')
+    console.log(`Server Started at ${port}...`);
 });
