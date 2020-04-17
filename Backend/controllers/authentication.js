@@ -1,8 +1,9 @@
 const User = require("../models/user");
 var { check, validationResult } = require('express-validator');
+var jwt = require('jsonwebtoken');
+var expressJwt = require('express-jwt');
 
-
-exports.signin = (request, response) => {
+exports.signup = (request, response) => {
 
     const errors = validationResult(request);
     if(!errors.isEmpty()){
@@ -10,7 +11,6 @@ exports.signin = (request, response) => {
             error: errors.array()[0].msg
         })
     }
-
 
     const user = new User(request.body)
     user.save((error , user) => {
@@ -28,9 +28,56 @@ exports.signin = (request, response) => {
     })
 }
 
+exports.signin = (request, response) => {
+    const { email, password } = request.body;
+
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        return response.status(422).json({
+            error: errors.array()[0].msg
+        })
+    }
+
+    User.findOne({email}, (error, user) => {
+        if(error || !user){
+            return response.status(400).json({
+                error: "USER email address does not match" 
+            });
+        }
+
+        if(!user.authenticate(password)){
+            return response.status(401).json({
+                error: "Email and password do not match"
+            })
+        }
+
+        //CREATE TOKEN
+        const token = jwt.sign({_id: user._id}, process.env.SECRET)
+        
+        //PUT TOKEN IN COOKIE
+        response.cookie("token", token, {expire: new Date() + 9999});
+
+        //SEND RESPONSE TO FRONTEND
+        const {_id, firstname, email, role} = user;
+        return response.json({token, user: {_id, firstname, email, role}});
+
+    });
+
+}
+
+
 exports.signout = (request, response) => {
+    response.clearCookie("token");
+
     response.json({
         message: "User Signout Success"
     });
 }
 
+//PROTECTED ROUTES
+exports.isSignedIn = expressJwt({
+    secret: process.env.SECRET,
+    userProperty: "auth"
+})
+
+//CUSTOM MIDDLEWARES
