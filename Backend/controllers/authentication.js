@@ -81,3 +81,23 @@ exports.isSignedIn = expressJwt({
 })
 
 //CUSTOM MIDDLEWARES
+exports.isAuthenticated = (request, response, next) => {
+    let checker = request.profile && request.auth && request.profile._id == request.auth._id;
+    console.log(request.auth);
+    console.log(request.profile);
+    if(!checker){
+        return response.status(403).json({
+            error: "ACCESS DENIED1"
+        });
+    }
+    next();
+};
+
+exports.isAdmin = (request, response, next) => {
+    if(request.profile.role === 0){
+        return response.status.json({
+            error: "ADMIN ACCESS DENIED"
+        });
+    }
+    next();
+};

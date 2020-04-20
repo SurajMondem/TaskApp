@@ -9,7 +9,7 @@ const cors = require("cors");
 
 //ROUTER IMPORTS
 const authRoutes = require("./routes/authentication");
-
+const userRoutes = require("./routes/user");
 
 //STARTER
 const app = express();
@@ -42,6 +42,7 @@ app.get('/', (request, response) => {
 });
 
 app.use('/api', authRoutes);
+app.use('/api', userRoutes);
 
 // // TEST CODE STARTS!!!
 // admin = (request, response) => {
