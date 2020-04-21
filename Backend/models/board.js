@@ -34,4 +34,4 @@ const boardSchema = new mongoose.Schema({
 
 const Board = mongoose.model("Board", boardSchema); 
 
-module.exports = mongoose.model(Board, Lists);
+module.exports = {Board, Lists};
