@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const Board = require("../models/board");
+const Cart = require("../models/cart");
 
 
 exports.getUserById = (request, response, next, id) => {
@@ -53,14 +53,42 @@ exports.updateUser = (request, response) => {
 }
 
 exports.userBoard = (request, response) => {
-    Board.find({user: request.profile._id})
+    Cart.find({user: request.profile._id})
     .populate("user", "_id name")
-    .exec((error, board) => {
+    .exec((error, cart) => {
         if(error){
             return response.status(400).json({
                 error: "No Boards Created in this account"
             });
         }
-        return response.json(board);
+        return response.json(cart);
     });
 }
+
+exports.pushBoardInList = (request, response, next) => {
+    
+    let boards = [];
+    request.body.cart.boards.forEach((board) => {
+        boards.push({
+            _id: board._id,
+            name: board.name,
+            description: board.description,
+
+        })
+    });
+    
+    //STORE THIS IN DB
+    User.findOneAndUpdate(
+        {_id: request.profile._id},
+        {$push: {boards: boards}},
+        {new: true},
+        (error, purchases) => {
+            if(error){
+                return response.status(400).json({
+                    error: "Unable to save Boards list"
+                });
+            }
+            next();
+        }
+    );
+};
