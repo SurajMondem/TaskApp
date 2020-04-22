@@ -39,6 +39,10 @@ var userSchema = new mongoose.Schema({
     role: {                 //TODO: THINK ABOUT THIS AGAIN
         type: Number,
         default: 0  
+    },
+    boards: {
+        type: Array,
+        default: []
     }
 }, { timestamps: true } );
 
